@@ -50,8 +50,8 @@ function calculate(form) {
 	var thresholdPaceSecs = SECONDS_IN_HOUR / (Math.pow(SECONDS_IN_HOUR / testSecs, 1 / 1.065) * testMiles);
 	form.elements.namedItem('pace').value = formatTime(paceSecs);
 	form.elements.namedItem('threshold').value = formatTime(thresholdPaceSecs);
-	var runningChart = document.getElementById('running');
-	var rows = runningChart.getElementsByTagName('tr');
+	var rows = document.getElementById('running').getElementsByTagName('tr');
+	var runPaces = {};
 	for (var i = 0; i < rows.length; i++) {
 		var cells = rows[i].getElementsByTagName('td');
 		var raceMiles = 0.0;
@@ -60,13 +60,29 @@ function calculate(form) {
 			var cell = cells[j];
 			if (cell.className == 'miles') {
 				raceMiles = parseFloat(cell.innerHTML);
-				alert(raceMiles);
 			} else if (cell.className == 'time') {
 				raceSecs = testSecs * Math.pow(raceMiles / testMiles, 1.065);
-				alert(raceSecs);
 				cell.innerHTML = formatTime(raceSecs);
 			} else if (cell.className == 'pace') {
+				runPaces[raceMiles.toString()] = raceSecs / raceMiles;
 				cell.innerHTML = formatTime(raceSecs / raceMiles);
+			}
+		}
+	}
+	rows = document.getElementById('triathlon').getElementsByTagName('tr');
+	for (var i = 0; i < rows.length; i++) {
+		var cells = rows[i].getElementsByTagName('td');
+		var runPaceSecs = runPaces[rows[i].getAttribute('data-run-pace')];
+		var legDistance = parseFloat(rows[i].getAttribute('data-distance'));
+		if (legDistance == 26.2) {
+			runPaceSecs += 60;
+		}
+		for (var j = 0; j < cells.length; j++) {
+			var cell = cells[j];
+			if (cell.className == 'time') {
+				cell.innerHTML = formatTime(runPaceSecs * legDistance);
+			} else if (cell.className == 'pace') {
+				cell.innerHTML = formatTime(runPaceSecs);
 			}
 		}
 	}
@@ -113,49 +129,84 @@ function calculate(form) {
 	</tr>
 	<tr>
 		<td>1 mile</td>
-		<td class="miles">1.00</td>
+		<td class="miles">1.0</td>
 		<td class="time" />
 		<td class="pace" />
 	</tr>
 	<tr>
 		<td>5K</td>
-		<td class="miles">3.10</td>
+		<td class="miles">3.1</td>
 		<td class="time" />
 		<td class="pace" />
 	</tr>
 	<tr>
 		<td>10K</td>
-		<td class="miles">6.20</td>
+		<td class="miles">6.2</td>
 		<td class="time" />
-		<td class="pace" />
+		<td class="pace" id="sprint" />
 	</tr>
 	<tr>
 		<td>15K</td>
-		<td class="miles">9.30</td>
+		<td class="miles">9.3</td>
 		<td class="time" />
 		<td class="pace" />
 	</tr>
 	<tr>
 		<td>10 miles</td>
-		<td class="miles">10.00</td>
+		<td class="miles">10.0</td>
 		<td class="time" />
 		<td class="pace" />
 	</tr>
 	<tr>
 		<td>Half marathon</td>
-		<td class="miles">13.10</td>
+		<td class="miles">13.1</td>
 		<td class="time" />
-		<td class="pace" />
+		<td class="pace" id="olympic" />
 	</tr>
 	<tr>
 		<td>20 miles</td>
-		<td class="miles">20.00</td>
+		<td class="miles">20.0</td>
 		<td class="time" />
 		<td class="pace" />
 	</tr>
 	<tr>
 		<td>Marathon</td>
-		<td class="miles">26.20</td>
+		<td class="miles">26.2</td>
+		<td class="time" />
+		<td class="pace" id="half_ironman" />
+	</tr>
+</table>
+<table id="triathlon" style="text-align: center;">
+	<tr>
+		<td colspan="4" align="center">Triathlon Speed Potential</td>
+	</tr>
+	<tr>
+		<td>Race</td>
+		<td>Distance (miles)</td>
+		<td>Time</td>
+		<td>Pace (min/mi)</td>
+	</tr>
+	<tr data-run-pace="6.2" data-distance="3.1">
+		<td>Sprint</td>
+		<td>3.1</td>
+		<td class="time" />
+		<td class="pace" />
+	</tr>
+	<tr data-run-pace="13.1" data-distance="6.2">
+		<td>Olympic</td>
+		<td>6.2</td>
+		<td class="time" />
+		<td class="pace" />
+	</tr>
+	<tr data-run-pace="26.2" data-distance="13.1">
+		<td>Half Ironman</td>
+		<td>13.1</td>
+		<td class="time" />
+		<td class="pace" />
+	</tr>
+	<tr data-run-pace="26.2" data-distance="26.2">
+		<td>Ironman</td>
+		<td>26.2</td>
 		<td class="time" />
 		<td class="pace" />
 	</tr>
