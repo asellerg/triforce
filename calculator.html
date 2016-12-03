@@ -1,0 +1,62 @@
+<script type="text/javascript">
+function parseTime(timeStr) {
+	var chunks = timeStr.split(':');
+	if (chunks.length < 2) {
+		return -1;
+	}
+	var hours = 0;
+	if (chunks.length == 3) {
+		hours = parseInt(chunks[0]);
+	}
+	var minutes = parseInt(chunks[chunks.length - 2]);
+	var seconds = parseInt(chunks[chunks.length - 1]);
+	return hours * 3600 + minutes * 60 + seconds;
+}
+
+function formatTime(seconds) {
+	return Math.floor(seconds / 60) + ':' + Math.round(seconds % 60);
+}
+
+function calculate(form) {
+	const SECONDS_IN_HOUR = 3600;
+	var timeSecs = parseTime(form.elements.namedItem('time').value);
+	var miles = parseFloat(form.elements.namedItem('distance').value);
+	if (form.elements.namedItem('factor').checked) {
+		miles *= 2;
+		timeSecs *= 2;
+	}
+	var paceSecs = timeSecs / miles;
+	var thresholdPaceSecs = SECONDS_IN_HOUR / (Math.pow(SECONDS_IN_HOUR / timeSecs, 1 / 1.065) * miles);
+	form.elements.namedItem('pace').value = formatTime(paceSecs);
+	form.elements.namedItem('threshold').value = formatTime(thresholdPaceSecs);
+}
+</script>
+<table>
+<form action="" onsubmit="calculate(this); return false;">
+	<tr>
+		<td>Distance</td>
+		<td><input type="text" name="distance"/></td>
+	</tr>
+	<tr>
+		<td>Time (hh:mm:ss)</td>
+		<td><input type="text" name="time"/></td>
+	</tr>
+	<tr>
+		<td colspan="2" align="center">Triathlon leg or 50% TT?&nbsp;<input type="checkbox" name="factor"/></td>
+	</tr>
+	<tr>
+		<td colspan="2" align="center"><input type="submit" /></td>
+	</tr>
+	<tr>
+		<td />
+	</tr>
+	<tr>
+		<td>Pace</td>
+		<td><input type="text" disabled="disabled" name="pace" /></td>
+	</tr>
+	<tr>
+		<td>Threshold Pace</td>
+		<td border="1"><input type="text" disabled="disabled" name="threshold" /></td>
+	</tr>
+</form>
+</table>
