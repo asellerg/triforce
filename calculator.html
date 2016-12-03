@@ -14,21 +14,62 @@ function parseTime(timeStr) {
 }
 
 function formatTime(seconds) {
-	return Math.floor(seconds / 60) + ':' + Math.round(seconds % 60);
+	var hours = Math.floor(seconds / 3600);
+	var minutes = 0;
+	var timeStr = '';
+	var minutesStr = '';
+	if (hours > 0) {
+		timeStr += hours + ':';
+		minutes = Math.floor((seconds % 3600) / 60);
+	} else {
+		minutes = Math.floor(seconds / 60);
+	}
+	if (hours > 0 && minutes < 10) {
+		minutesStr += '0' + minutes;
+	} else {
+		minutesStr += minutes;
+	}
+	var secondsStr = '';
+	if (Math.round(seconds % 60) < 10) {
+		secondsStr = '0' + Math.round(seconds % 60);
+	} else {
+		secondsStr = Math.round(seconds % 60);
+	}
+	return timeStr + minutesStr + ':' + secondsStr;
 }
 
 function calculate(form) {
 	const SECONDS_IN_HOUR = 3600;
-	var timeSecs = parseTime(form.elements.namedItem('time').value);
-	var miles = parseFloat(form.elements.namedItem('distance').value);
+	var testSecs = parseTime(form.elements.namedItem('time').value);
+	var testMiles = parseFloat(form.elements.namedItem('distance').value);
 	if (form.elements.namedItem('factor').checked) {
-		miles *= 2;
-		timeSecs *= 2;
+		testMiles *= 2;
+		testSecs *= 2;
 	}
-	var paceSecs = timeSecs / miles;
-	var thresholdPaceSecs = SECONDS_IN_HOUR / (Math.pow(SECONDS_IN_HOUR / timeSecs, 1 / 1.065) * miles);
+	var paceSecs = testSecs / testMiles;
+	var thresholdPaceSecs = SECONDS_IN_HOUR / (Math.pow(SECONDS_IN_HOUR / testSecs, 1 / 1.065) * testMiles);
 	form.elements.namedItem('pace').value = formatTime(paceSecs);
 	form.elements.namedItem('threshold').value = formatTime(thresholdPaceSecs);
+	var runningChart = document.getElementById('running');
+	var rows = runningChart.getElementsByTagName('tr');
+	for (var i = 0; i < rows.length; i++) {
+		var cells = rows[i].getElementsByTagName('td');
+		var raceMiles = 0.0;
+		var raceSecs = 0;
+		for (var j = 0; j < cells.length; j++) {
+			var cell = cells[j];
+			if (cell.className == 'miles') {
+				raceMiles = parseFloat(cell.innerHTML);
+				alert(raceMiles);
+			} else if (cell.className == 'time') {
+				raceSecs = testSecs * Math.pow(raceMiles / testMiles, 1.065);
+				alert(raceSecs);
+				cell.innerHTML = formatTime(raceSecs);
+			} else if (cell.className == 'pace') {
+				cell.innerHTML = formatTime(raceSecs / raceMiles);
+			}
+		}
+	}
 }
 </script>
 <table>
@@ -59,4 +100,63 @@ function calculate(form) {
 		<td border="1"><input type="text" disabled="disabled" name="threshold" /></td>
 	</tr>
 </form>
+</table>
+<table id="running" style="text-align: center;">
+	<tr>
+		<td colspan="4" align="center">Predicted Running Race Times</td>
+	</tr>
+	<tr>
+		<td>Race</td>
+		<td>Distance (miles)</td>
+		<td>Time</td>
+		<td>Pace (min/mi)</td>
+	</tr>
+	<tr>
+		<td>1 mile</td>
+		<td class="miles">1.00</td>
+		<td class="time" />
+		<td class="pace" />
+	</tr>
+	<tr>
+		<td>5K</td>
+		<td class="miles">3.10</td>
+		<td class="time" />
+		<td class="pace" />
+	</tr>
+	<tr>
+		<td>10K</td>
+		<td class="miles">6.20</td>
+		<td class="time" />
+		<td class="pace" />
+	</tr>
+	<tr>
+		<td>15K</td>
+		<td class="miles">9.30</td>
+		<td class="time" />
+		<td class="pace" />
+	</tr>
+	<tr>
+		<td>10 miles</td>
+		<td class="miles">10.00</td>
+		<td class="time" />
+		<td class="pace" />
+	</tr>
+	<tr>
+		<td>Half marathon</td>
+		<td class="miles">13.10</td>
+		<td class="time" />
+		<td class="pace" />
+	</tr>
+	<tr>
+		<td>20 miles</td>
+		<td class="miles">20.00</td>
+		<td class="time" />
+		<td class="pace" />
+	</tr>
+	<tr>
+		<td>Marathon</td>
+		<td class="miles">26.20</td>
+		<td class="time" />
+		<td class="pace" />
+	</tr>
 </table>
