@@ -4,25 +4,35 @@ function calculate(form) {
 	const SECONDS_IN_HOUR = 3600;
 	var fourHundredTTsecs = parseTime(form.elements.namedItem('400').value);
 	var twoHundredTTsecs = parseTime(form.elements.namedItem('200').value);
-	form.elements.namedItem('css').value = formatTime(100/(200/(fourHundredTTsecs - twoHundredTTsecs)));
+	var cssSecs = 100/(200/(fourHundredTTsecs - twoHundredTTsecs));
+	form.elements.namedItem('css').value = formatTime(cssSecs);
 	form.elements.namedItem('dropoff').value = Math.round((fourHundredTTsecs / (2 * twoHundredTTsecs) - 1) * 100) + '%';
+	rows = document.getElementById('swim').getElementsByTagName('tr');
+	for (var i = 0; i < rows.length; i++) {
+		var cells = rows[i].getElementsByTagName('td');
+		for (var j = 0; j < cells.length; j++) {
+			var cell = cells[j];
+			if (!cell.hasAttribute('data-factor')) {
+				continue;
+			}
+			var factor = parseFloat(cell.getAttribute('data-factor'));
+			cell.innerHTML = formatTime(cssSecs * factor);
+		}
+	}
 }
 </script>
 <table>
 <form action="" onsubmit="calculate(this); return false;">
 	<tr>
-		<td>400 TT (hh:mm:ss)</td>
+		<td>400 TT (mm:ss)</td>
 		<td><input type="text" name="400"/></td>
 	</tr>
 	<tr>
-		<td>200 TT (hh:mm:ss)</td>
+		<td>200 TT (mm:ss)</td>
 		<td><input type="text" name="200"/></td>
 	</tr>
 	<tr>
 		<td colspan="2" align="center"><input type="submit" /></td>
-	</tr>
-	<tr>
-		<td />
 	</tr>
 	<tr>
 		<td>CSS</td>
@@ -33,4 +43,31 @@ function calculate(form) {
 		<td border="1"><input type="text" disabled="disabled" name="dropoff" /></td>
 	</tr>
 </form>
+</table>
+<table id="swim" style="text-align: center;">
+	<tr>
+		<td>Zone</td>
+		<td>Fast end</td>
+		<td>Slow end</td>
+	</tr>
+	<tr>
+		<td>Easy</td>
+		<td data-factor="1.15" />
+		<td>&infin;</td>
+	</tr>
+	<tr>
+		<td>Steady</td>
+		<td data-factor="1.075" />
+		<td data-factor="1.15" />
+	</tr>
+	<tr>
+		<td>Tempo</td>
+		<td data-factor="1.038" />
+		<td data-factor="1.075" />
+	</tr>
+	<tr>
+		<td>Threshold</td>
+		<td data-factor="1.0" />
+		<td data-factor="1.038" />
+	</tr>
 </table>
