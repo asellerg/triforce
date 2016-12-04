@@ -1,0 +1,36 @@
+<script type="text/javascript" src="time.js"></script>
+<script type="text/javascript">
+function calculate(form) {
+	const SECONDS_IN_HOUR = 3600;
+	var fourHundredTTsecs = parseTime(form.elements.namedItem('400').value);
+	var twoHundredTTsecs = parseTime(form.elements.namedItem('200').value);
+	form.elements.namedItem('css').value = formatTime(100/(200/(fourHundredTTsecs - twoHundredTTsecs)));
+	form.elements.namedItem('dropoff').value = Math.round((fourHundredTTsecs / (2 * twoHundredTTsecs) - 1) * 100) + '%';
+}
+</script>
+<table>
+<form action="" onsubmit="calculate(this); return false;">
+	<tr>
+		<td>400 TT (hh:mm:ss)</td>
+		<td><input type="text" name="400"/></td>
+	</tr>
+	<tr>
+		<td>200 TT (hh:mm:ss)</td>
+		<td><input type="text" name="200"/></td>
+	</tr>
+	<tr>
+		<td colspan="2" align="center"><input type="submit" /></td>
+	</tr>
+	<tr>
+		<td />
+	</tr>
+	<tr>
+		<td>CSS</td>
+		<td><input type="text" disabled="disabled" name="css" /></td>
+	</tr>
+	<tr>
+		<td>Dropoff</td>
+		<td border="1"><input type="text" disabled="disabled" name="dropoff" /></td>
+	</tr>
+</form>
+</table>
